@@ -35,6 +35,8 @@ Run "nvim -V1 -v" for more info
 
 ## 基础配置vimrc
 
+> 使用`ln -s ~/.config.nvim/vimrc ~/.vimrc`命令可以将配置文件共享给vim使用。
+
 ### Options
 
 ```
@@ -201,3 +203,44 @@ vim.keymap.set('v', '>', '>gv', opts)
 在init.lua中导入`require('keymaps')`。
 
 ## 插件管理器
+
+我使用`lazy.nvim`作为nvim的插件管理器。
+
+### 初始化lazy.nvim
+
+`~/.config/nvim/lua/lazynvim-init.lua`
+
+```lua
+-- 1. 准备lazy.nvim模块（存在性检测）
+-- stdpath("data")
+-- macOS/Linux: ~/.local/share/nvim
+-- Windows: ~/AppData/Local/nvim-data
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+	vim.fn.system({
+		"git",
+		"clone",
+		"--filter=blob:none",
+		"https://github.com/folke/lazy.nvim.git",
+		"--branch=stable", -- latest stable release
+		lazypath,
+	})
+end
+-- 
+-- 2. 将 lazypath 设置为运行时路径
+-- rtp（runtime path）
+-- nvim进行路径搜索的时候，除已有的路径，还会从prepend的路径中查找
+-- 否则，下面 require("lazy") 是找不到的
+vim.opt.rtp:prepend(lazypath)
+
+-- 3. 加载lazy.nvim模块
+require("lazy").setup({})
+```
+
+在init.lua中导入`require('keymaps')`。
+
+上述配置完毕以后，让我们首次启动nvim，第一次启动的时候，由于会从远端下载lazy.nvim模块，所以会有一定的延迟。然后，我们就会进入正常的nvim界面。然后命令模式下输入指令`:Lazy`后，我们会看到nvim的界面弹出一个对话框，展示lazy的状态。
+
+### 安装插件
+
+### 插件推荐
