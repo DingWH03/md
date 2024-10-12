@@ -243,4 +243,70 @@ require("lazy").setup({})
 
 ### 安装插件
 
+####  方式1:直接配置
+
+只需要在上面的lazynvim-init.lua的中require("lazy").setup({})添加插件安装代码即可：
+
+```lua
+local nvim_tree_plugin = {
+    "nvim-tree/nvim-tree.lua",
+    version = "*",
+    dependencies = {"nvim-tree/nvim-web-devicons"},
+    config = function()
+        require("nvim-tree").setup {}
+    end
+}
+local lualine_plugin = {
+    'nvim-lualine/lualine.nvim',
+    config = function()
+        require('lualine').setup()
+    end
+}
+require("lazy").setup({nvim_tree_plugin, lualine_plugin})
+```
+
+上述方式下，我们首先定义了两个插件配置的table；然后，在setup中第一个参数table中，逐个添加插件。这样lazy.nvim就能帮我们将插件进行下载、安装。
+
+#### 方式2:plugins目录统一编排
+
+上述方式1固然简单，但每一次想要添加一个插件就需要在lazynvim-init.lua中添加插件代码；另外，大量的插件配置势必造成lazynvim-init.lua愈发臃肿。好在lazy.nvim还支持我们以更加优雅的方式编排插件：使用plugins目录统一编排插件。具体做法为：
+
+第一步：lazynvim-init.lua中的setup参数变为setup("plugins")，同时移除掉有关具体插件安装配置的代码；
+
+第二步：在lazynvim-init.lua所在目录下创建一个名为"plugins"的目录；
+
+第三步：在plugins目录中创建插件配置模块lua脚本。在这一步中，我们分别创建两个lua脚本来分别作为两个插件的配置模块：
+
+`plugin-lualine.lua`
+
+```lua
+return {
+    {
+        'nvim-lualine/lualine.nvim',
+        config = function()
+            require('lualine').setup()
+        end
+    }
+}
+```
+
+`plugin-nvim-tree.lua`
+
+```lua
+return {
+    {
+        "nvim-tree/nvim-tree.lua",
+        version = "*",
+        dependencies = {"nvim-tree/nvim-web-devicons"},
+        config = function()
+            require("nvim-tree").setup {}
+        end
+    }
+}
+```
+
+这里有两个注意点：1）文件名可以随意；2）每一个脚本模块都将返回一个table，且table的每一项都是一个插件配置（这里每个文件只有一项插件配置），lazy会把这些table合并为一个插件配置的table进行加载
+
+要添加其他模块,只需要仿照这两个模块的方式,在`plugins`文件夹下建立更多文件即可.
+
 ### 插件推荐
